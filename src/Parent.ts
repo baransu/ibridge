@@ -20,6 +20,7 @@ interface IConstructorArgs {
   name?: string;
   classList?: Array<string>;
   showIframe?: boolean;
+  iframe?: HTMLIFrameElement | null;
 }
 
 export default class ParentAPI extends Emittery {
@@ -41,12 +42,13 @@ export default class ParentAPI extends Emittery {
     name = "",
     classList = [],
     showIframe = false,
+    iframe,
   }: IConstructorArgs) {
     super();
     this.url = url;
     this.container = container;
     this.parent = window;
-    this.frame = document.createElement("iframe");
+    this.frame = iframe ?? document.createElement("iframe");
     this.frame.name = name;
     this.frame.classList.add(...classList);
     if (!showIframe) {
@@ -148,10 +150,12 @@ export default class ParentAPI extends Emittery {
     return value;
   }
 
-  destroy(): void {
+  destroy(destroyIframe: boolean = true): void {
     debug("Destroying Postmate instance");
     window.removeEventListener("message", this.dispatcher, false);
-    this.frame.parentNode?.removeChild(this.frame);
+    if (destroyIframe) {
+      this.frame.parentNode?.removeChild(this.frame);
+    }
   }
 }
 
