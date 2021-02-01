@@ -7,6 +7,10 @@ export default function isValidEvent(
   event: MessageEvent,
   allowedOrigin: string | undefined
 ): boolean {
+  if (allowedOrigin == "*") {
+    return true;
+  }
+
   const validators = [
     () => event.origin === allowedOrigin,
     () => !!event.data,
