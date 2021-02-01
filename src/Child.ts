@@ -18,6 +18,7 @@ const debug = debugFactory("ibridge:child");
 export interface IConstructorArgs<TModel, TContext> {
   model: TModel;
   context: TContext;
+  secure?: boolean;
 }
 
 export default class ChildAPI<TModel, TContext = any> extends Emittery {
@@ -26,13 +27,19 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
   public readonly child: Window;
   public parentOrigin?: string;
   public context?: TContext;
+  public readonly secure: boolean;
 
-  constructor(model: TModel, context?: TContext) {
+  constructor({
+    model,
+    context,
+    secure = true,
+  }: IConstructorArgs<TModel, TContext>) {
     super();
     this.child = window;
     this.parent = this.child.parent;
     this.model = model;
     this.context = context;
+    this.secure = secure;
 
     this.setListeners();
   }
@@ -64,7 +71,7 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
       }
     }
 
-    if (!isValidEvent(event, this.parentOrigin)) {
+    if (!this.secure && !isValidEvent(event, this.parentOrigin)) {
       debug(
         "parent origin mismatch. Expected %s got %s",
         this.parentOrigin,
@@ -85,7 +92,7 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
 
     this.parent.postMessage(
       createChildEmit(eventName, data),
-      this.parentOrigin!
+      this.secure ? this.parentOrigin! : "*"
     );
   }
 

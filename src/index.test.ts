@@ -35,7 +35,7 @@ test("integration", async () => {
 
   const parentWindow = window;
 
-  const child = new iBridge.Child(model, context);
+  const child = new iBridge.Child({ model, context });
   // this should never be used in prod
   (child as any).parentOrigin = "*";
   // Hook the child with the fake parent and child windows

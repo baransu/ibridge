@@ -20,6 +20,7 @@ interface IConstructorArgs {
   name?: string;
   classList?: Array<string>;
   showIframe?: boolean;
+  secure?: boolean;
 }
 
 export default class ParentAPI extends Emittery {
@@ -29,6 +30,7 @@ export default class ParentAPI extends Emittery {
   public readonly frame: HTMLIFrameElement;
   public childOrigin: string;
   public readonly container: HTMLElement;
+  public readonly secure: boolean;
 
   /**
    * The maximum number of attempts to send a handshake request to the parent
@@ -41,6 +43,7 @@ export default class ParentAPI extends Emittery {
     name = "",
     classList = [],
     showIframe = false,
+    secure = true,
   }: IConstructorArgs) {
     super();
     this.url = url;
@@ -49,6 +52,7 @@ export default class ParentAPI extends Emittery {
     this.frame = document.createElement("iframe");
     this.frame.name = name;
     this.frame.classList.add(...classList);
+    this.secure = secure;
     if (!showIframe) {
       // Make it invisible
       this.frame.style.width = "0";
@@ -88,7 +92,10 @@ export default class ParentAPI extends Emittery {
   emitToChild(eventName: string, data?: unknown): void {
     debug(`emitToChild "%s" with data %O`, eventName, data);
 
-    this.child.postMessage(createParentEmit(eventName, data), this.childOrigin);
+    this.child.postMessage(
+      createParentEmit(eventName, data),
+      this.secure ? this.childOrigin : "*"
+    );
   }
 
   async handshake(): Promise<ParentAPI> {
