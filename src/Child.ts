@@ -53,7 +53,7 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
   private async dispatcher(event: MessageEvent): Promise<void> {
     debug(`dispatcher got event %O`, event);
     // We only want to set this up on the first handshake request
-    if (!this.parentOrigin) {
+    if (this.secure && !this.parentOrigin) {
       debug(`no parentOrigin, trying to use event.origin %s`, event.origin);
       const data = (event.data || {}) as Partial<IParentEmit>;
       const { type, kind, eventName } = data;
@@ -71,7 +71,7 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
       }
     }
 
-    if (!this.secure && !isValidEvent(event, this.parentOrigin)) {
+    if (this.secure && !isValidEvent(event, this.parentOrigin)) {
       debug(
         "parent origin mismatch. Expected %s got %s",
         this.parentOrigin,
