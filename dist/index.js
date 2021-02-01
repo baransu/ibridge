@@ -143,7 +143,7 @@ var ChildAPI = /*#__PURE__*/function (_Emittery) {
               case 0:
                 debug("dispatcher got event %O", event); // We only want to set this up on the first handshake request
 
-                if (!this.parentOrigin) {
+                if (this.secure && !this.parentOrigin) {
                   debug("no parentOrigin, trying to use event.origin %s", event.origin);
                   data = event.data || {};
                   type = data.type, kind = data.kind, eventName = data.eventName;
@@ -157,7 +157,7 @@ var ChildAPI = /*#__PURE__*/function (_Emittery) {
                   }
                 }
 
-                if (!(!this.secure && !(0,_isValidEvent__WEBPACK_IMPORTED_MODULE_5__.default)(event, this.parentOrigin))) {
+                if (!(this.secure && !(0,_isValidEvent__WEBPACK_IMPORTED_MODULE_5__.default)(event, this.parentOrigin))) {
                   _context.next = 5;
                   break;
                 }

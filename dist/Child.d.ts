@@ -2,7 +2,7 @@ import Emittery from "emittery";
 import { IGetRequest } from "./events";
 export interface IConstructorArgs<TModel, TContext> {
     model: TModel;
-    context: TContext;
+    context?: TContext;
     secure?: boolean;
 }
 export default class ChildAPI<TModel, TContext = any> extends Emittery {
