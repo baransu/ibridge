@@ -17,7 +17,7 @@ const debug = debugFactory("ibridge:child");
 
 export interface IConstructorArgs<TModel, TContext> {
   model: TModel;
-  context: TContext;
+  context?: TContext;
   secure?: boolean;
 }
 
