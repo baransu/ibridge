@@ -26,6 +26,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => /* binding */ ChildAPI
 /* harmony export */ });
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var emittery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! emittery */ "./node_modules/emittery/index.js");
@@ -74,6 +75,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -217,21 +219,84 @@ var ChildAPI = /*#__PURE__*/function (_Emittery) {
       return handshake;
     }()
   }, {
-    key: "handleGet",
+    key: "get",
     value: function () {
-      var _handleGet = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(_ref2) {
-        var id, property, args, fn, value, error;
+      var _get2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(property) {
+        var id,
+            _len,
+            args,
+            _key,
+            eventName,
+            _ref2,
+            value,
+            error,
+            _args3 = arguments;
+
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                id = _ref2.id, property = _ref2.property, args = _ref2.args;
+                id = (0,uuid__WEBPACK_IMPORTED_MODULE_6__.default)();
+
+                for (_len = _args3.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                  args[_key - 1] = _args3[_key];
+                }
+
+                this.emitToParent(_constants__WEBPACK_IMPORTED_MODULE_3__.GET_REQUEST, {
+                  id: id,
+                  property: property,
+                  args: args
+                });
+                eventName = (0,_events__WEBPACK_IMPORTED_MODULE_4__.getResponse)(id);
+                debug("get await for response event %s", eventName);
+                _context3.next = 7;
+                return this.once(eventName);
+
+              case 7:
+                _ref2 = _context3.sent;
+                value = _ref2.value;
+                error = _ref2.error;
+
+                if (!error) {
+                  _context3.next = 12;
+                  break;
+                }
+
+                throw error;
+
+              case 12:
+                return _context3.abrupt("return", value);
+
+              case 13:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function get(_x2) {
+        return _get2.apply(this, arguments);
+      }
+
+      return get;
+    }()
+  }, {
+    key: "handleGet",
+    value: function () {
+      var _handleGet = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(_ref3) {
+        var id, property, args, fn, value, error;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                id = _ref3.id, property = _ref3.property, args = _ref3.args;
                 // property might be a full lodash path
                 fn = lodash_get__WEBPACK_IMPORTED_MODULE_2___default()(this.model, property);
-                _context3.prev = 2;
+                _context4.prev = 2;
 
                 if (!(typeof fn !== "function")) {
-                  _context3.next = 6;
+                  _context4.next = 6;
                   break;
                 }
 
@@ -239,18 +304,18 @@ var ChildAPI = /*#__PURE__*/function (_Emittery) {
                 throw new Error("model function not found");
 
               case 6:
-                _context3.next = 8;
+                _context4.next = 8;
                 return fn.call.apply(fn, [this.context].concat(_toConsumableArray(args)));
 
               case 8:
-                value = _context3.sent;
-                _context3.next = 14;
+                value = _context4.sent;
+                _context4.next = 14;
                 break;
 
               case 11:
-                _context3.prev = 11;
-                _context3.t0 = _context3["catch"](2);
-                error = _context3.t0;
+                _context4.prev = 11;
+                _context4.t0 = _context4["catch"](2);
+                error = _context4.t0;
 
               case 14:
                 this.emitToParent((0,_events__WEBPACK_IMPORTED_MODULE_4__.getResponse)(id), {
@@ -262,13 +327,13 @@ var ChildAPI = /*#__PURE__*/function (_Emittery) {
 
               case 15:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this, [[2, 11]]);
+        }, _callee4, this, [[2, 11]]);
       }));
 
-      function handleGet(_x2) {
+      function handleGet(_x3) {
         return _handleGet.apply(this, arguments);
       }
 
@@ -300,14 +365,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => /* binding */ ParentAPI,
 /* harmony export */   "timeout": () => /* binding */ timeout
 /* harmony export */ });
-/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js");
 /* harmony import */ var debug__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(debug__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var emittery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! emittery */ "./node_modules/emittery/index.js");
 /* harmony import */ var emittery__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(emittery__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./events */ "./src/events.ts");
-/* harmony import */ var _isValidEvent__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./isValidEvent */ "./src/isValidEvent.ts");
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./constants */ "./src/constants.ts");
+/* harmony import */ var lodash_get__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash.get */ "./node_modules/lodash.get/index.js");
+/* harmony import */ var lodash_get__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_get__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./events */ "./src/events.ts");
+/* harmony import */ var _isValidEvent__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./isValidEvent */ "./src/isValidEvent.ts");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./constants */ "./src/constants.ts");
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -355,6 +422,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
 var debug = debug__WEBPACK_IMPORTED_MODULE_0___default()("ibridge:parent");
 
 var ParentAPI = /*#__PURE__*/function (_Emittery) {
@@ -365,7 +433,7 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
   /**
    * The maximum number of attempts to send a handshake request to the parent
    */
-  function ParentAPI(_ref) {
+  function ParentAPI(_ref, model, context) {
     var _this$frame$classList, _this$frame$contentDo;
 
     var _this;
@@ -396,9 +464,15 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
 
     _defineProperty(_assertThisInitialized(_this), "container", void 0);
 
+    _defineProperty(_assertThisInitialized(_this), "model", void 0);
+
+    _defineProperty(_assertThisInitialized(_this), "context", void 0);
+
     _this.url = url;
     _this.container = container;
     _this.parent = window;
+    _this.model = model;
+    _this.context = context;
     _this.frame = document.createElement("iframe");
     _this.frame.name = name;
 
@@ -417,9 +491,8 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
 
     _this.child = _this.frame.contentWindow || ((_this$frame$contentDo = _this.frame.contentDocument) === null || _this$frame$contentDo === void 0 ? void 0 : _this$frame$contentDo.parentWindow);
     _this.childOrigin = resolveOrigin(url);
-    debug("setting up main listeners");
 
-    _this.parent.addEventListener("message", _this.dispatcher.bind(_assertThisInitialized(_this)), false);
+    _this.setListeners();
 
     return _this;
   }
@@ -429,12 +502,12 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
     value: function dispatcher(event) {
       debug("dispatcher got event %O", event);
 
-      if (!(0,_isValidEvent__WEBPACK_IMPORTED_MODULE_3__.default)(event, this.childOrigin)) {
+      if (!(0,_isValidEvent__WEBPACK_IMPORTED_MODULE_4__.default)(event, this.childOrigin)) {
         debug("parent origin mismatch. Expected %s got %s", this.childOrigin, event.origin);
         return;
       }
 
-      if (event.data.kind === _constants__WEBPACK_IMPORTED_MODULE_4__.CHILD_EMIT) {
+      if (event.data.kind === _constants__WEBPACK_IMPORTED_MODULE_5__.CHILD_EMIT) {
         var _ref2 = event.data,
             eventName = _ref2.eventName,
             data = _ref2.data;
@@ -443,10 +516,17 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
       }
     }
   }, {
+    key: "setListeners",
+    value: function setListeners() {
+      debug("setting up main listeners");
+      this.parent.addEventListener("message", this.dispatcher.bind(this), false);
+      this.on(_constants__WEBPACK_IMPORTED_MODULE_5__.GET_REQUEST, this.handleGet.bind(this));
+    }
+  }, {
     key: "emitToChild",
     value: function emitToChild(eventName, data) {
       debug("emitToChild \"%s\" with data %O", eventName, data);
-      this.child.postMessage((0,_events__WEBPACK_IMPORTED_MODULE_2__.createParentEmit)(eventName, data), this.childOrigin);
+      this.child.postMessage((0,_events__WEBPACK_IMPORTED_MODULE_3__.createParentEmit)(eventName, data), this.childOrigin);
     }
   }, {
     key: "handshake",
@@ -476,11 +556,11 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
                             attempt++;
                             debug("handshake attempt %s %s", attempt, _this2.childOrigin);
 
-                            _this2.emitToChild(_constants__WEBPACK_IMPORTED_MODULE_4__.HANDHSAKE_START, undefined);
+                            _this2.emitToChild(_constants__WEBPACK_IMPORTED_MODULE_5__.HANDHSAKE_START, undefined);
 
                             _context.prev = 4;
                             _context.next = 7;
-                            return Promise.race([_this2.once(_constants__WEBPACK_IMPORTED_MODULE_4__.HANDSHAKE_REPLY), timeout(500)]);
+                            return Promise.race([_this2.once(_constants__WEBPACK_IMPORTED_MODULE_5__.HANDSHAKE_REPLY), timeout(500)]);
 
                           case 7:
                             _context.next = 12;
@@ -494,7 +574,7 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
                           case 12:
                             debug("Received handshake reply from Child"); // Clean up any outstanding handhsake reply "once" listeners
 
-                            _this2.clearListeners(_constants__WEBPACK_IMPORTED_MODULE_4__.HANDSHAKE_REPLY);
+                            _this2.clearListeners(_constants__WEBPACK_IMPORTED_MODULE_5__.HANDSHAKE_REPLY);
 
                             return _context.abrupt("return");
 
@@ -567,7 +647,7 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
   }, {
     key: "get",
     value: function () {
-      var _get = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(property) {
+      var _get2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(property) {
         var id,
             _len,
             args,
@@ -582,18 +662,18 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                id = (0,uuid__WEBPACK_IMPORTED_MODULE_5__.default)();
+                id = (0,uuid__WEBPACK_IMPORTED_MODULE_6__.default)();
 
                 for (_len = _args4.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
                   args[_key - 1] = _args4[_key];
                 }
 
-                this.emitToChild(_constants__WEBPACK_IMPORTED_MODULE_4__.GET_REQUEST, {
+                this.emitToChild(_constants__WEBPACK_IMPORTED_MODULE_5__.GET_REQUEST, {
                   id: id,
                   property: property,
                   args: args
                 });
-                eventName = (0,_events__WEBPACK_IMPORTED_MODULE_2__.getResponse)(id);
+                eventName = (0,_events__WEBPACK_IMPORTED_MODULE_3__.getResponse)(id);
                 debug("get await for response event %s", eventName);
                 _context4.next = 7;
                 return this.once(eventName);
@@ -622,7 +702,7 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
       }));
 
       function get(_x) {
-        return _get.apply(this, arguments);
+        return _get2.apply(this, arguments);
       }
 
       return get;
@@ -636,6 +716,64 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
       window.removeEventListener("message", this.dispatcher, false);
       (_this$frame$parentNod = this.frame.parentNode) === null || _this$frame$parentNod === void 0 ? void 0 : _this$frame$parentNod.removeChild(this.frame);
     }
+  }, {
+    key: "handleGet",
+    value: function () {
+      var _handleGet = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(_ref6) {
+        var id, property, args, fn, value, error;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                id = _ref6.id, property = _ref6.property, args = _ref6.args;
+                // property might be a full lodash path
+                fn = lodash_get__WEBPACK_IMPORTED_MODULE_2___default()(this.model, property);
+                _context5.prev = 2;
+
+                if (!(typeof fn !== "function")) {
+                  _context5.next = 6;
+                  break;
+                }
+
+                debug("the model ".concat(property, " was called, but it isn't a function, got ").concat(fn));
+                throw new Error("model function not found");
+
+              case 6:
+                _context5.next = 8;
+                return fn.call.apply(fn, [this.context].concat(_toConsumableArray(args)));
+
+              case 8:
+                value = _context5.sent;
+                _context5.next = 14;
+                break;
+
+              case 11:
+                _context5.prev = 11;
+                _context5.t0 = _context5["catch"](2);
+                error = _context5.t0;
+
+              case 14:
+                this.emitToChild((0,_events__WEBPACK_IMPORTED_MODULE_3__.getResponse)(id), {
+                  id: id,
+                  property: property,
+                  value: value,
+                  error: error
+                });
+
+              case 15:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this, [[2, 11]]);
+      }));
+
+      function handleGet(_x2) {
+        return _handleGet.apply(this, arguments);
+      }
+
+      return handleGet;
+    }()
   }]);
 
   return ParentAPI;

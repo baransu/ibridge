@@ -15,5 +15,6 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
     private dispatcher;
     emitToParent(eventName: string, data?: unknown): void;
     handshake(): Promise<ChildAPI<TModel, TContext>>;
+    get(property: string, ...args: Array<any>): Promise<any>;
     handleGet({ id, property, args }: IGetRequest): Promise<void>;
 }
