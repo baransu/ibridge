@@ -1,6 +1,7 @@
 import { v4 as uuid } from "uuid";
 import debugFactory from "debug";
 import Emittery from "emittery";
+import _get from "lodash.get";
 
 import { IChildEmit, IGetResponse, IGetRequest, getResponse } from "./events";
 import { createParentEmit } from "./events";
@@ -22,30 +23,38 @@ interface IConstructorArgs {
   showIframe?: boolean;
 }
 
-export default class ParentAPI extends Emittery {
+export default class ParentAPI<TModel, TContext = any> extends Emittery {
   public readonly url: string;
   public readonly parent: Window;
   public readonly child: Window;
   public readonly frame: HTMLIFrameElement;
   public childOrigin: string;
   public readonly container: HTMLElement;
+  private model: TModel;
+  public context?: TContext;
 
   /**
    * The maximum number of attempts to send a handshake request to the parent
    */
   static maxHandshakeRequests = 5;
 
-  constructor({
-    container = document.body,
-    url,
-    name = "",
-    classList = [],
-    showIframe = false,
-  }: IConstructorArgs) {
+  constructor(
+    {
+      container = document.body,
+      url,
+      name = "",
+      classList = [],
+      showIframe = false,
+    }: IConstructorArgs,
+    model: TModel,
+    context?: TContext
+  ) {
     super();
     this.url = url;
     this.container = container;
     this.parent = window;
+    this.model = model;
+    this.context = context;
     this.frame = document.createElement("iframe");
     this.frame.name = name;
     this.frame.classList.add(...classList);
@@ -63,8 +72,7 @@ export default class ParentAPI extends Emittery {
       (this.frame.contentDocument as any)?.parentWindow;
     this.childOrigin = resolveOrigin(url);
 
-    debug("setting up main listeners");
-    this.parent.addEventListener("message", this.dispatcher.bind(this), false);
+    this.setListeners();
   }
 
   private dispatcher(event: MessageEvent): void {
@@ -85,13 +93,19 @@ export default class ParentAPI extends Emittery {
     }
   }
 
+  private setListeners(): void {
+    debug("setting up main listeners");
+    this.parent.addEventListener("message", this.dispatcher.bind(this), false);
+    this.on(GET_REQUEST, this.handleGet.bind(this) as any);
+  }
+
   emitToChild(eventName: string, data?: unknown): void {
     debug(`emitToChild "%s" with data %O`, eventName, data);
 
     this.child.postMessage(createParentEmit(eventName, data), this.childOrigin);
   }
 
-  async handshake(): Promise<ParentAPI> {
+  async handshake(): Promise<ParentAPI<TModel, TContext>> {
     debug("starting handshake");
     let attempt = 0;
 
@@ -152,6 +166,31 @@ export default class ParentAPI extends Emittery {
     debug("Destroying Postmate instance");
     window.removeEventListener("message", this.dispatcher, false);
     this.frame.parentNode?.removeChild(this.frame);
+  }
+
+  async handleGet({ id, property, args }: IGetRequest): Promise<void> {
+    // property might be a full lodash path
+    const fn = _get(this.model, property);
+
+    let value, error;
+    try {
+      if (typeof fn !== "function") {
+        debug(
+          `the model ${property} was called, but it isn't a function, got ${fn}`
+        );
+        throw new Error("model function not found");
+      }
+      value = await fn.call(this.context, ...args);
+    } catch (err) {
+      error = err;
+    }
+
+    this.emitToChild(getResponse(id), {
+      id,
+      property,
+      value,
+      error,
+    } as IGetResponse);
   }
 }
 

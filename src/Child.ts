@@ -1,3 +1,4 @@
+import { v4 as uuid } from "uuid";
 import debugFactory from "debug";
 import Emittery from "emittery";
 import _get from "lodash.get";
@@ -96,6 +97,20 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
     this.emitToParent(HANDSHAKE_REPLY, undefined);
     debug("handshake ok");
     return this;
+  }
+
+  async get(property: string, ...args: Array<any>): Promise<any> {
+    const id = uuid();
+
+    this.emitToParent(GET_REQUEST, { id, property, args } as IGetRequest);
+    const eventName = getResponse(id);
+    debug("get await for response event %s", eventName);
+    const { value, error } = (await this.once(eventName)) as IGetResponse;
+    if (error) {
+      throw error;
+    }
+
+    return value;
   }
 
   async handleGet({ id, property, args }: IGetRequest): Promise<void> {

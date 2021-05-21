@@ -1,6 +1,6 @@
 import webcrypto from "@trust/webcrypto";
 import { JSDOM } from "jsdom";
-import ibridge, { Parent } from "./index";
+import { Parent } from "./index";
 
 // TODO we jsdom misbehaves in this scenario, we need
 // to either figure out jsdom or move this test to a selenium
@@ -21,11 +21,11 @@ test.skip("integration test", async () => {
   await new Promise((resolve) => dom.window.addEventListener("load", resolve));
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
-  const iparent = (dom.window as any).iparent as Parent;
+  const iparent = (dom.window as any).iparent as Parent<any>;
 
-  //const value = await iparent.get("vehicles.getCar", 123);
-  //expect(value).toBe({ fake: true, carId: 123 });
+  // const value = await iparent.get("vehicles.getCar", 123);
+  // expect(value).toBe({ fake: true, carId: 123 });
 
-  //const error = await iparent.get("getError").catch((err: any) => err);
-  //expect(error).toBe("fake error");
+  // const error = await iparent.get("getError").catch((err: any) => err);
+  // expect(error).toBe("fake error");
 });

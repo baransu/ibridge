@@ -27,7 +27,7 @@ test("integration", async () => {
     },
   };
 
-  const parent = new iBridge.Parent({ url: "about:blank" });
+  const parent = new iBridge.Parent({ url: "about:blank" }, model, context);
   // this should never be used in prod
   (parent as any).childOrigin = "*";
   // Hook the parent with the fake childWindow
@@ -46,10 +46,22 @@ test("integration", async () => {
   await Promise.all([child.handshake(), parent.handshake()]);
 
   const userId = 123;
-  const value = await parent.get("users.getUser", userId);
-  expect(value).toEqual({
+
+  // Parent requests something from child
+  const childResult = await parent.get("users.getUser", userId);
+  expect(childResult).toEqual({
     userId,
     fake: true,
     context: context.ctxValue,
   });
+
+  // Child requests something from parent
+  const parentResult = await parent.get("users.getUser", userId);
+  expect(parentResult).toEqual({
+    userId,
+    fake: true,
+    context: context.ctxValue,
+  });
+
+  expect(childResult).toEqual(parentResult);
 });
