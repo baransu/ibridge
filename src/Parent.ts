@@ -99,16 +99,17 @@ export default class ParentAPI<TModel, TContext = any> extends Emittery {
     this.on(GET_REQUEST, this.handleGet.bind(this) as any);
   }
 
-  emitToChild(eventName: string, data?: unknown): void {
+  public emitToChild(eventName: string, data?: unknown): void {
     debug(`emitToChild "%s" with data %O`, eventName, data);
 
+    console.log(this, this.frame);
     this.frame.contentWindow?.postMessage(
       createParentEmit(eventName, data),
       this.childOrigin
     );
   }
 
-  async handshake(): Promise<ParentAPI<TModel, TContext>> {
+  public async handshake(): Promise<ParentAPI<TModel, TContext>> {
     debug("starting handshake");
     let attempt = 0;
 
@@ -165,13 +166,13 @@ export default class ParentAPI<TModel, TContext = any> extends Emittery {
     return value;
   }
 
-  destroy(): void {
+  public destroy(): void {
     debug("Destroying Postmate instance");
     window.removeEventListener("message", this.dispatcher, false);
     this.frame.parentNode?.removeChild(this.frame);
   }
 
-  async handleGet({ id, property, args }: IGetRequest): Promise<void> {
+  public async handleGet({ id, property, args }: IGetRequest): Promise<void> {
     // property might be a full lodash path
     const fn = _get(this.model, property);
 

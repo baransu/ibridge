@@ -81,7 +81,7 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
     }
   }
 
-  emitToParent(eventName: string, data?: unknown): void {
+  public emitToParent(eventName: string, data?: unknown): void {
     debug(`emitToParent "%s" with data %O`, eventName, data);
 
     this.parent.postMessage(
@@ -90,7 +90,7 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
     );
   }
 
-  async handshake(): Promise<ChildAPI<TModel, TContext>> {
+  public async handshake(): Promise<ChildAPI<TModel, TContext>> {
     await this.once(HANDHSAKE_START);
     debug("received handshake from Parent");
     debug("sending handshake reply to Parent");
@@ -99,7 +99,7 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
     return this;
   }
 
-  async get(property: string, ...args: Array<any>): Promise<any> {
+  public async get(property: string, ...args: Array<any>): Promise<any> {
     const id = uuid();
 
     this.emitToParent(GET_REQUEST, { id, property, args } as IGetRequest);
@@ -113,7 +113,7 @@ export default class ChildAPI<TModel, TContext = any> extends Emittery {
     return value;
   }
 
-  async handleGet({ id, property, args }: IGetRequest): Promise<void> {
+  public async handleGet({ id, property, args }: IGetRequest): Promise<void> {
     // property might be a full lodash path
     const fn = _get(this.model, property);
 
