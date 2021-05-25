@@ -26,7 +26,7 @@ interface IConstructorArgs {
 export default class ParentAPI<TModel, TContext = any> extends Emittery {
   public readonly url: string;
   public readonly parent: Window;
-  public readonly child: Window;
+  // public readonly child: Window;
   public readonly frame: HTMLIFrameElement;
   public childOrigin: string;
   public readonly container: HTMLElement;
@@ -67,9 +67,9 @@ export default class ParentAPI<TModel, TContext = any> extends Emittery {
     debug("Loading frame %s", url);
     this.container.appendChild(this.frame);
 
-    this.child =
-      this.frame.contentWindow ||
-      (this.frame.contentDocument as any)?.parentWindow;
+    // this.child =
+    //   this.frame.contentWindow ||
+    //   (this.frame.contentDocument as any)?.parentWindow;
     this.childOrigin = resolveOrigin(url);
 
     this.setListeners();
@@ -102,7 +102,10 @@ export default class ParentAPI<TModel, TContext = any> extends Emittery {
   emitToChild(eventName: string, data?: unknown): void {
     debug(`emitToChild "%s" with data %O`, eventName, data);
 
-    this.child.postMessage(createParentEmit(eventName, data), this.childOrigin);
+    this.frame.contentWindow?.postMessage(
+      createParentEmit(eventName, data),
+      this.childOrigin
+    );
   }
 
   async handshake(): Promise<ParentAPI<TModel, TContext>> {

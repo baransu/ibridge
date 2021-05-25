@@ -10,7 +10,6 @@ interface IConstructorArgs {
 export default class ParentAPI<TModel, TContext = any> extends Emittery {
     readonly url: string;
     readonly parent: Window;
-    readonly child: Window;
     readonly frame: HTMLIFrameElement;
     childOrigin: string;
     readonly container: HTMLElement;

@@ -430,11 +430,13 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
 
   var _super = _createSuper(ParentAPI);
 
+  // public readonly child: Window;
+
   /**
    * The maximum number of attempts to send a handshake request to the parent
    */
   function ParentAPI(_ref, model, context) {
-    var _this$frame$classList, _this$frame$contentDo;
+    var _this$frame$classList;
 
     var _this;
 
@@ -455,8 +457,6 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
     _defineProperty(_assertThisInitialized(_this), "url", void 0);
 
     _defineProperty(_assertThisInitialized(_this), "parent", void 0);
-
-    _defineProperty(_assertThisInitialized(_this), "child", void 0);
 
     _defineProperty(_assertThisInitialized(_this), "frame", void 0);
 
@@ -487,9 +487,11 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
 
     debug("Loading frame %s", url);
 
-    _this.container.appendChild(_this.frame);
+    _this.container.appendChild(_this.frame); // this.child =
+    //   this.frame.contentWindow ||
+    //   (this.frame.contentDocument as any)?.parentWindow;
 
-    _this.child = _this.frame.contentWindow || ((_this$frame$contentDo = _this.frame.contentDocument) === null || _this$frame$contentDo === void 0 ? void 0 : _this$frame$contentDo.parentWindow);
+
     _this.childOrigin = resolveOrigin(url);
 
     _this.setListeners();
@@ -525,8 +527,10 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
   }, {
     key: "emitToChild",
     value: function emitToChild(eventName, data) {
+      var _this$frame$contentWi;
+
       debug("emitToChild \"%s\" with data %O", eventName, data);
-      this.child.postMessage((0,_events__WEBPACK_IMPORTED_MODULE_3__.createParentEmit)(eventName, data), this.childOrigin);
+      (_this$frame$contentWi = this.frame.contentWindow) === null || _this$frame$contentWi === void 0 ? void 0 : _this$frame$contentWi.postMessage((0,_events__WEBPACK_IMPORTED_MODULE_3__.createParentEmit)(eventName, data), this.childOrigin);
     }
   }, {
     key: "handshake",
