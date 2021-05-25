@@ -530,7 +530,6 @@ var ParentAPI = /*#__PURE__*/function (_Emittery) {
       var _this$frame$contentWi;
 
       debug("emitToChild \"%s\" with data %O", eventName, data);
-      console.log(this, this.frame);
       (_this$frame$contentWi = this.frame.contentWindow) === null || _this$frame$contentWi === void 0 ? void 0 : _this$frame$contentWi.postMessage((0,_events__WEBPACK_IMPORTED_MODULE_3__.createParentEmit)(eventName, data), this.childOrigin);
     }
   }, {
