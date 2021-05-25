@@ -102,7 +102,6 @@ export default class ParentAPI<TModel, TContext = any> extends Emittery {
   public emitToChild(eventName: string, data?: unknown): void {
     debug(`emitToChild "%s" with data %O`, eventName, data);
 
-    console.log(this, this.frame);
     this.frame.contentWindow?.postMessage(
       createParentEmit(eventName, data),
       this.childOrigin
